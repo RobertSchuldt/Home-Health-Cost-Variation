@@ -93,11 +93,11 @@ run;
 data cost_analysis;
 	set hhc_puf_hsa;
 		
-		%let t = type_of_ownership
+		%let t = type_of_ownership;
 	if &t = "Proprietary" then for_profit = 1;
 					else for_profit = 0;
 	if &t = "Government - Combination Government & Voluntary" 
-	or & t = "Government - Local"
+	or &t = "Government - Local"
 	or &t = "Government - State/ County" 
 			then government = 1;
 					else not_for_profit = 0;
@@ -105,8 +105,20 @@ data cost_analysis;
   		&t = "Non - Profit Religious" 
 			then not_for_profit = 1;
 					else not_for_profit = 0;
+	/*creating our other variables of interset within the puf*/
+		percent_female = ((Distinct_Beneficiaries__non_LUPA - Male_Beneficiaries)/Distinct_Beneficiaries__non_LUPA)*100;
+		percent_dual = (Dual_Beneficiaries/Distinct_Beneficiaries__non_LUPA)*100;
+		percent_non_white = ( ( Distinct_Beneficiaries__non_LUPA - White_Beneficiaries)/Distinct_Beneficiaries__non_LUPA)*100;
+		episodes_per_bene =  Distinct_Beneficiaries__non_LUPA/VAR7;
 
 
+	/*Our per beneficiary standardized expenditure*/
+	ex_pb = Total_HHA_Medicare_Standard_Paym/Distinct_Beneficiaries__non_LUPA;
 
+	run;
+title 'Check missing on set';
+proc means;
+var percent_female percent_dual episodes_per_bene percent_non_white;
+run;
 
 
