@@ -92,7 +92,8 @@ run;
 
 data cost_analysis;
 	set hhc_puf_hsa;
-		
+	
+	if Male_Beneficiaries =. and Female_Beneficiaries = . then delete;
 		%let t = type_of_ownership;
 	if &t = "Proprietary" then for_profit = 1;
 					else for_profit = 0;
