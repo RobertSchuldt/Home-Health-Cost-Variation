@@ -7,6 +7,8 @@
 option symbolgen;
 
 libname cost 'E:\Cost HHA Paper\Redux Cost Paper 2019';
+libname ahrf 'X:\Data\AHRF\2016-2017\Data';
+
 
 /*Import macro for the various files I'm going to need to be using*/
 %macro import(file, type, name);
@@ -123,3 +125,6 @@ var percent_female percent_dual episodes_per_bene percent_non_white;
 run;
 
 
+data ahrf;
+	set ahrf.ahrf_2016_2017;
+	run;
