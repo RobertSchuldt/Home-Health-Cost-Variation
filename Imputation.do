@@ -36,10 +36,40 @@ keep if difference_costs != .
 
 sum difference_costs
 
-sort hsanum
+sort fips
 
-by hsanum: egen total_diff = sum(difference_costs)
+by fips: egen total_diff = sum(difference_costs)
 
 xtile deciles = total_diff, nq(10)
 
 graph box total_diff, over(deciles)
+
+by fips: egen total_pat = total(distinct_beneficiaries__non_lupa)
+
+gen hhi_portion = ((distinct_beneficiaries__non_lupa/total_pat)*100)^2
+
+by fips: egen hhi = total(hhi_portion)
+
+sort deciles
+
+by deciles: sum hhi
+
+gen count = 1
+
+sort fips
+by fips: egen total_agen = total(count)
+
+by fips: egen total_fp = total(for_profit) 
+by fips: egen total_gov = total(government)
+
+gen percent_gov = total_gov/total_agen
+gen percent_fp = total_fp/total_agen
+
+gen tenured =date_certified>14072
+
+by fips: egen total_tenure = total(tenured)
+by fips: gen percent_tenure = total_tenure/total_agen
+
+reg difference percent_fp percent_gov percent_tenure hhi per_cap_nursin per_cap_hosp /*
+*/ median_income, cluster(state)
+
