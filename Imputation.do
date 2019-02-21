@@ -54,7 +54,7 @@ sort deciles
 
 by deciles: sum hhi
 
-gen count = 1
+
 
 sort fips
 by fips: egen total_agen = total(count)
@@ -69,6 +69,14 @@ gen tenured =date_certified>14072
 
 by fips: egen total_tenure = total(tenured)
 by fips: gen percent_tenure = total_tenure/total_agen
+
+reg difference percent_fp percent_gov percent_tenure hhi per_cap_nursin per_cap_hosp /*
+*/ median_income, cluster(state)
+
+/*Dropping variables three standard deviations outside the mean*/
+
+sum difference
+drop if (difference-(r(mean))>(3*r(sd)))
 
 reg difference percent_fp percent_gov percent_tenure hhi per_cap_nursin per_cap_hosp /*
 */ median_income, cluster(state)
