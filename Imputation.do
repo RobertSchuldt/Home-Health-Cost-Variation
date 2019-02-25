@@ -7,6 +7,7 @@ clear
 
 use "E:\Cost HHA Paper\Redux Cost Paper 2019\cost_analysis.dta", clear
 
+
 mi set mlong
 
 
@@ -50,6 +51,8 @@ gen hhi_portion = ((distinct_beneficiaries__non_lupa/total_pat)*100)^2
 
 by fips: egen hhi = total(hhi_portion)
 
+by fips: gen hhi2 = hhi^2
+
 sort deciles
 
 by deciles: sum hhi
@@ -71,7 +74,7 @@ by fips: egen total_tenure = total(tenured)
 by fips: gen percent_tenure = total_tenure/total_agen
 
 reg difference percent_fp percent_gov percent_tenure hhi per_cap_nursin per_cap_hosp /*
-*/ median_income, cluster(state)
+*/ median_income hhi2, cluster(state)
 
 /*Dropping variables three standard deviations outside the mean*/
 
