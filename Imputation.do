@@ -73,14 +73,16 @@ gen tenured =date_certified>14072
 by fips: egen total_tenure = total(tenured)
 by fips: gen percent_tenure = total_tenure/total_agen
 
-reg difference percent_fp percent_gov percent_tenure hhi per_cap_nursin per_cap_hosp /*
-*/ median_income hhi2, cluster(state)
+gen hhi_median =hhi>1668
+
+reg difference percent_fp percent_gov percent_tenure hhi_median per_cap_nursin per_cap_hosp /*
+*/ median_income , cluster(state)
 
 /*Dropping variables three standard deviations outside the mean*/
 
 sum difference
 drop if (difference-(r(mean))>(3*r(sd)))
 
-reg difference percent_fp percent_gov percent_tenure hhi per_cap_nursin per_cap_hosp /*
+reg difference percent_fp percent_gov percent_tenure hhi_median per_cap_nursin per_cap_hosp /*
 */ median_income, cluster(state)
 
