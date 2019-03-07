@@ -1,4 +1,4 @@
-/*HHA Cost Analysis using MI and moving to the HSA level of 
+/*HHA Cost Analysis using MI and moving to the county level of 
 analysis. Data management in SAS, calculations in STATA 14*/
 
 cd  "E:\Cost HHA Paper\Redux Cost Paper 2019\
@@ -68,7 +68,7 @@ by fips: egen total_gov = total(government)
 gen percent_gov = total_gov/total_agen
 gen percent_fp = total_fp/total_agen
 
-gen tenured =date_certified>14072
+gen tenured =date_certified<14072
 
 by fips: egen total_tenure = total(tenured)
 by fips: gen percent_tenure = total_tenure/total_agen
