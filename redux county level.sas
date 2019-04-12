@@ -10,7 +10,7 @@ option symbolgen;
 
 libname cost 'E:\Cost HHA Paper\Redux Cost Paper 2019';
 libname ahrf 'X:\Data\AHRF\2017-2018';
-libname pos 'X:\Data\POS\2015\Data';
+
 
 /*Import macro for the various files I'm going to need to be using*/
 %macro import(file, type, name);
@@ -24,7 +24,7 @@ run;
 %import(E:\puffiles\HH PUF - Provider 2016, xlsx, puf)
 
 data pos;
-	set pos.pos_2015;
+	set cost.pos2016;
 	where PRVDR_CTGRY_CD = "05";
 	keep PRVDR_NUM GNRL_CNTL_TYPE_CD FIPS_STATE_CD FIPS_CNTY_CD nfp fp gov other;
 	rename prvdr_num = CMS_Certification_Number__CCN_;
