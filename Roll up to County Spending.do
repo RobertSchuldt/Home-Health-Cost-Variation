@@ -60,3 +60,9 @@ reg pat_spend percent_gov percent_fp hhi num_bene per_cap_nursin per_cap_hosp  m
 */ bene_de bene_di /*
 */ bene_ih bene_os /*
 */arthritis bene_sc, cluster(state_code)
+
+reg pat_spend percent_gov percent_fp hhi  per_cap_nursin per_cap_hosp  median_income bene_as bene_ca /*
+*/bene_ch bene_c1 bene_co /*
+*/ bene_de bene_di /*
+*/ bene_ih bene_os /*
+*/arthritis bene_sc [w=num_bene], cluster(state_code)
