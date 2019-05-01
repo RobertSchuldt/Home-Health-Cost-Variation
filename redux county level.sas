@@ -78,11 +78,13 @@ run;
 data cost_analysis;
 	set puf_pos;	
 	
-	if Male_Beneficiaries =. and Female_Beneficiaries = . then delete;
 	
 	length fips $ 7;
 	fips = catt(FIPS_STATE_CD,FIPS_CNTY_CD);
 	if fips = '12025' then fips = '12086';
+
+	if Male_Beneficiaries = . and Female_Beneficiaries = . then delete;
+
 	/*creating our other variables of interset within the puf*/
 		percent_female = ((Distinct_Beneficiaries__non_LUPA - Male_Beneficiaries)/Distinct_Beneficiaries__non_LUPA)*100;
 		percent_dual = (Dual_Beneficiaries/Distinct_Beneficiaries__non_LUPA)*100;
@@ -119,6 +121,7 @@ data ahrf_puf;
 	if b;
 	run;
 
-
+proc contents data = ahrf_puf;
+run;
 
 
