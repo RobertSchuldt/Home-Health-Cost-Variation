@@ -105,20 +105,21 @@ gen medianincome2 = median_income/1000
 encode(state), gen(state_code)
 
 
-local weight weightedage  weightedIHD weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+local weight weightedage weightedDiabetes  weightedIHD weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
-collapse `weight'  medianincome2 percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
+collapse `weight' percent_non_white medianincome2 median_income percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
+
+local weight weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
 
 
-
-reg pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female per_cap_nursin per_cap_hosp  medianincome2 `weight', cluster(state_code)
+reg pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight', cluster(state_code)
 
 gen log_spend = log(pat_spend)
 kdensity log_spend
-reg log_spend percent_gov percent_fp weightedhcc hhi2  percent_dual percent_female per_cap_nursin per_cap_hosp  medianincome2 `weight', cluster(state_code)
+reg log_spend percent_gov percent_fp weightedhcc hhi2  percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight', cluster(state_code)
 
 
 
-sum pat_spend percent_gov percent_fp weightedhcc hhi2 num_bene percent_dual percent_female per_cap_nursin per_cap_hosp  medianincome2 `weight'
+sum pat_spend percent_gov percent_fp weightedhcc hhi2 num_bene percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  median_income `weight'
 
