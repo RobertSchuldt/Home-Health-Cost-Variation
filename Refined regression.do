@@ -1,9 +1,3 @@
-cd  "C:\Users\3043340\Desktop\Box Sync\Schuldt Research Work\Cost HHA Paper\Redux Cost Paper 2019"
-set more off
-clear
-
-use  "E:\Cost HHA Paper\Redux Cost Paper 2019\cost_analysis2.dta", clear
-
 rename distinct_beneficiaries__non_lupa num_bene
 
 sort fips
@@ -14,6 +8,13 @@ label var hccweight "Weighted HCC score"
 
 by fips: egen weightedhcc = sum(hccweight)
 label var weightedhcc "Weighted HCC Score by fips" 
+
+sum crtfctn_dt
+gen tenuremean = r(mean)
+gen tenure = crtfctn_dt<tenuremean
+by fips: egen total_agencies = sum(count)
+by fips: egen total_tenure = sum(tenure)
+by fips: gen per_tenure = total_tenure/total_agencies
 
 
 gen ageweight = (average_age*num_bene)/totalbeneficiaries
@@ -96,7 +97,7 @@ gen hhi_portion = ((num_bene/total_pat)*100)^2
 
 by fips: egen hhi = total(hhi_portion)
 
-gen hhi2= hhi>7160.34
+gen hhi2= hhi<7160.34
 
 gen medianincome2 = median_income/1000
 
@@ -105,21 +106,48 @@ gen medianincome2 = median_income/1000
 encode(state), gen(state_code)
 
 
-local weight weightedage weightedDiabetes  weightedIHD weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+local  weight  per_tenure weightedage weightedDiabetes  weightedIHD weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
-collapse `weight' percent_non_white medianincome2 median_income percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
+collapse `weight' total_hha_medicare_standard_paym totalbeneficiaries percent_non_white medianincome2  percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
 
-local weight weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
 
 
-reg pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight', cluster(state_code)
+reg pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' [w=totalbeneficiaries], cluster(state_code) 
 
 gen log_spend = log(pat_spend)
 kdensity log_spend
-reg log_spend percent_gov percent_fp weightedhcc hhi2  percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight', cluster(state_code)
+
+local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+
+reg log_spend percent_gov percent_fp weightedhcc hhi2  percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' , cluster(state_code)
 
 
 
 sum pat_spend percent_gov percent_fp weightedhcc hhi2 num_bene percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  median_income `weight'
 
+/* Make my Quintiles of Spending per pat, Total Spending, and Number of pats*/
+
+egen patient_quintiles= xtile(totalbeneficiaries), nq(5)
+
+egen totalcharge_quintiles= xtile(total_hha_medicare_standard_paym), nq(5)
+
+egen spending_quintiles= xtile(pat_spend), nq(5)
+
+/* make my graphics */
+
+graph box pat_spend, over(spending_quintiles) title("Medicare Expenditure per Beneficiary by Quintile") note("2015 Data") ytitle("Per Patient Expenditure") 
+
+graph box totalbeneficiaries, over(patient_quintiles) title("Quintiles of Home Health Beneficiaries by County") note("2015 Data") ytitle("Number of Patients") nooutsides 
+
+graph box total_hha_medicare_standard_paym, over(totalcharge_quintiles) title("Quintiles of Total Home Health Expenditure by County") note("2015 Data") ytitle("Total Home Health Expenditure") nooutsides 
+
+
+
+local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+glm pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
+
+local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+
+glm totalbeneficiaries percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
