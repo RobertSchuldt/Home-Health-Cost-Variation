@@ -145,9 +145,16 @@ graph box total_hha_medicare_standard_paym, over(totalcharge_quintiles) title("Q
 
 
 
-local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+/*local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 glm pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
+*/
+local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+
+
+kdensity totalbeneficiaries
+glm totalbeneficiaries percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
 
 local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
-glm totalbeneficiaries percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
+kdensity pat_spend
+glm pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
