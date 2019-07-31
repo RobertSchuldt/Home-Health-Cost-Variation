@@ -1,23 +1,23 @@
-rename distinct_beneficiaries__non_lupa num_bene
+rename Distinct_Beneficiaries__non_LUPA num_bene
 
 sort fips
 
 by fips: egen totalbeneficiaries = sum(num_bene)
-gen hccweight = (average_hcc_score*num_bene)/totalbeneficiaries
+gen hccweight = (Average_HCC_Score*num_bene)/totalbeneficiaries
 label var hccweight "Weighted HCC score"
 
 by fips: egen weightedhcc = sum(hccweight)
 label var weightedhcc "Weighted HCC Score by fips" 
 
-sum crtfctn_dt
+sum tenure
 gen tenuremean = r(mean)
-gen tenure = crtfctn_dt<tenuremean
+gen tenure_agency = tenure>tenuremean
 by fips: egen total_agencies = sum(count)
-by fips: egen total_tenure = sum(tenure)
+by fips: egen total_tenure = sum(tenure_agency)
 by fips: gen per_tenure = total_tenure/total_agencies
 
 
-gen ageweight = (average_age*num_bene)/totalbeneficiaries
+gen ageweight = (Average_Age*num_bene)/totalbeneficiaries
 label var ageweight "Weighted age"
 
 by fips: egen weightedage = sum(ageweight)
@@ -25,32 +25,32 @@ label var weightedage "Weighted age by fips"
 
  
 
-rename percent_of_beneficiaries_with_al alzheimers
-rename percent_of_beneficiaries_with_at atrial_fib
-rename percent_of_beneficiaries_with_hy hypertension
+rename Percent_of_Beneficiaries_with_Al alzheimers
+rename Percent_of_Beneficiaries_with_At atrial_fib
+rename Percent_of_Beneficiaries_with_Hy hypertension
 
 
-rename percent_of_beneficiaries_with_ra arthritis
+rename Percent_of_Beneficiaries_with_RA arthritis
 replace arthritis = 0 if arthritis == .
-rename percent_of_beneficiaries_with_as Asthma
+rename Percent_of_Beneficiaries_with_As Asthma
 
-rename percent_of_beneficiaries_with_ca Cancer
+rename Percent_of_Beneficiaries_with_Ca Cancer
 
-rename percent_of_beneficiaries_with_ch CHF
+rename Percent_of_Beneficiaries_with_CH CHF
 
-rename percent_of_beneficiaries_with_c1 kidney
+rename Percent_of_Beneficiaries_with_C1 kidney
 
-rename percent_of_beneficiaries_with_co COPD
+rename Percent_of_Beneficiaries_with_CO COPD
 
-rename percent_of_beneficiaries_with_de Depression
+rename Percent_of_Beneficiaries_with_De Depression
 
-rename percent_of_beneficiaries_with_di Diabetes
+rename Percent_of_Beneficiaries_with_Di Diabetes
 
-rename percent_of_beneficiaries_with_ih IHD
+rename Percent_of_Beneficiaries_with_IH IHD
 
-rename percent_of_beneficiaries_with_os Osteo
+rename Percent_of_Beneficiaries_with_Os Osteo
 
-rename percent_of_beneficiaries_with_sc Schizophrenia
+rename Percent_of_Beneficiaries_with_Sc Schizophrenia
 
 mdesc    weightedhcc  num_bene per_cap_nursin per_cap_hosp  median_income Diabetes IHD /*
 */Schizophrenia COPD Osteo /*
@@ -75,7 +75,7 @@ by fips: egen weighted`var' = sum(`var')
 label var weighted`var' "Weighted `var' by fips" 
 }
 
-gen pat_spend = total_hha_medicare_standard_paym/num_bene
+gen pat_spend = Total_HHA_Medicare_Standard_Paym/num_bene
 
 sort fips
 
@@ -103,12 +103,12 @@ gen medianincome2 = median_income/1000
 
 
 
-encode(state), gen(state_code)
+encode(State), gen(state_code)
 
 
 local  weight  per_tenure weightedage weightedDiabetes  weightedIHD weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
-collapse `weight' total_hha_medicare_standard_paym totalbeneficiaries percent_non_white medianincome2  percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
+collapse `weight'  totalbeneficiaries percent_non_white medianincome2  percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
 
 local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
