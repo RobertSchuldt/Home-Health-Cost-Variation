@@ -96,7 +96,7 @@ gen percent_fp = total_fp/total_agen
 
 
 by fips: egen total_pat = total(num_bene)
-
+by fips: egen total_count = sum(count)
 gen hhi_portion = ((num_bene/total_pat)*100)^2
 
 by fips: egen hhi = total(hhi_portion)
@@ -112,7 +112,7 @@ encode(State), gen(state_code)
 
 local  weight  per_tenure weightedage weightedDiabetes  weightedIHD weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
-collapse `weight' hhi_quartiles  urban urban2 percap_pcp totalbeneficiaries percent_non_white medianincome2  percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
+collapse total_count `weight' hhi_quartiles  urban urban2 percap_pcp totalbeneficiaries percent_non_white medianincome2  percent_dual percent_female weightedhcc percent_gov percent_fp hhi hhi2 pat_spend num_bene per_cap_nursin per_cap_hosp  median_income   state_code, by(fips)
 
 local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
 
@@ -123,9 +123,9 @@ reg pat_spend percent_gov percent_fp weightedhcc urban hhi2 percent_dual percent
 gen log_spend = log(pat_spend)
 kdensity log_spend
  gen agesquare = weightedage*weightedage
-local weight  per_tenure weightedage agesquare weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
+local weight  per_tenure weightedage 
 
-reg log_spend percent_gov   percent_fp weightedhcc i.hhi_quartiles urban percent_dual percent_female percent_non_white per_cap_nursin percap_pcp per_cap_hosp  medianincome2 `weight' i.state_code,  cluster(fips)
+reg log_spend percent_gov   percent_fp weightedhcc ib4.hhi_quartiles urban percent_dual percent_female percent_non_white  percap_pcp per_cap_hosp  medianincome2 `weight' i.state_code
 /* Fixed effects  and cluster at the county level*/
 
 /* non linear age*/
@@ -134,41 +134,6 @@ reg log_spend percent_gov   percent_fp weightedhcc i.hhi_quartiles urban percent
 sum urban pat_spend percent_gov percent_fp weightedhcc hhi2 num_bene percent_dual percent_female percent_non_white per_cap_nursin percap_pcp per_cap_hosp  median_income `weight'
 
 /* Make my Quintiles of Spending per pat, Total Spending, and Number of pats*/
+sort hhi_quartiles
 
-
-
-egen spending_quintiles= xtile(pat_spend), nq(5)
-
-
-sort spending_quintiles
-
-by spending_quintiles: sum pat_spend, detail
-
-sum pat_spend, detail
-
-
-
-
-/* make my graphics */
-
-graph box pat_spend, over(spending_quintiles) title("Medicare Expenditure per Beneficiary by Quintile") note("2015 Data") ytitle("Per Patient Expenditure") 
-
-graph box totalbeneficiaries, over(patient_quintiles) title("Quintiles of Home Health Beneficiaries by County") note("2015 Data") ytitle("Number of Patients") nooutsides 
-
-graph box Total_HHA_Medicare_Standard_Paym, over(totalcharge_quintiles) title("Quintiles of Total Home Health Expenditure by County") note("2015 Data") ytitle("Total Home Health Expenditure") nooutsides 
-
-
-
-/*local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
-glm pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
-*/
-local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
-
-
-kdensity totalbeneficiaries
-glm totalbeneficiaries percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
-
-local weight  per_tenure weightedage weightedDiabetes   weightedSchizophrenia weightedCOPD weightedOsteo  weightedCHF weightedCancer weightedAsthma   weightedatrial_fib weightedalzheimers
-
-kdensity pat_spend
-glm pat_spend percent_gov percent_fp weightedhcc hhi2 percent_dual percent_female percent_non_white per_cap_nursin per_cap_hosp  medianincome2 `weight' ,family(gamma) link(log) cluster(state_code) 
+by hhi_quartiles: sum total_count percent_fp
