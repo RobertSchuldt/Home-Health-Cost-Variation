@@ -30,21 +30,8 @@ run;
 data pos;
 	set cost.pos2016;
 	where PRVDR_CTGRY_CD = "05";
-	keep PRVDR_NUM  FIPS_STATE_CD FIPS_CNTY_CD GNRL_CNTL_TYPE_CD CRTFCTN_DT year tenure nfp fp gov;
+	keep PRVDR_NUM  FIPS_STATE_CD FIPS_CNTY_CD;
 	rename prvdr_num = CMS_Certification_Number__CCN_;
-
-	year = int(CRTFCTN_DT/10000); 
-	tenure = 2015-year;
-%let own = GNRL_CNTL_TYPE_CD;
-	
-	if &own = "04" then fp = 1;
-		else fp = 0;
-	if &own = '01' or &own = "02" or &own = "03" 
-		then nfp = 1;
-			else nfp = 0;
-	gov = 0;
-	if fp ne 1 and nfp ne 1 then gov = 1;
-
 	run;
 
 %import(C:\Users\3043340\Box\Cost Variation Final\HHC_SOCRATA_PRVDR.csv , csv, hhc)
@@ -55,6 +42,30 @@ data hhc_year;
 	keep  Date_Certified Type_of_Ownership year CMS_Certification_Number__CCN_ tenure fp nfp gov;
 	year = substr(Date_Certified, 1, 4); 
 	year2 = input(year, 4.);
+	tenure = 2017-year2;
+	fp = 0;
+	if Type_of_Ownership = 'Proprietary' then fp = 1;
+
+
+	nfp = 0;
+	if Type_of_Ownership = 'Non - Profit Other' then nfp = 1;
+	if Type_of_Ownership = 'Non - Profit Private' then nfp = 1;
+	if Type_of_Ownership = 'Non - Profit Religious' then nfp = 1;
+
+gov= 0;
+	if Type_of_Ownership = 'Government - State/ County' then gov = 1;
+	if Type_of_Ownership = 'Government - Local' then gov = 1;
+	if Type_of_Ownership = 'Government - Combination Gov' then gov = 1;
+
+	run;
+
+proc freq;
+table  year Type_of_Ownership;
+run;
+
+proc means;
+var tenure;
+run;
 
 data puf1;
 	set puf;
@@ -70,12 +81,22 @@ run;
 
 %include 'C:\Users\3043340\Box\Schuldt Research Work\SAS Macros\infile macros\sort.sas';
 
+/*Now I merge the PUF with the crosswalk for zip code to county*/
 
 %sort(puf1, CMS_Certification_Number__CCN_)
+%sort(hhc_year, CMS_Certification_Number__CCN_)
+
+data puf_hcc;
+	merge puf1 (in = a) hhc_year (in = b);
+	by CMS_Certification_Number__CCN_;
+	if a;
+	if b;
+run;
+%sort(puf_hcc, CMS_Certification_Number__CCN_)
 %sort(pos, CMS_Certification_Number__CCN_)
 
 data puf_pos;
-	merge puf1 (in = a) pos (in = b);
+	merge puf_hcc (in = a) pos (in = b);
 	by CMS_Certification_Number__CCN_;
 	if a;
 	if b;
@@ -98,6 +119,7 @@ data cost_analysis;
 	fips = catt(FIPS_STATE_CD,FIPS_CNTY_CD);
 	if fips = '12025' then fips = '12086';
 
+	if Male_Beneficiaries = . and Female_Beneficiaries = . then delete;
 
 	/*creating our other variables of interset within the puf*/
 		percent_female = ((Distinct_Beneficiaries__non_LUPA - Male_Beneficiaries)/Distinct_Beneficiaries__non_LUPA)*100;
@@ -107,7 +129,7 @@ data cost_analysis;
 	run;
 
 title 'Check missing on set';
-proc means nmiss;
+proc means;
 var percent_female percent_dual episodes_per_bene percent_non_white;
 run;
 
