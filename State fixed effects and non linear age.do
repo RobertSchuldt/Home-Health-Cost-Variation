@@ -1,10 +1,5 @@
 cd "C:\Users\3043340\Box\Cost Variation Final\Tables"
-
-
-gen ln_spend = ln(pat_spend)
-gen median2 = median_income/1000
-
-
+use cost_variation, clear
 
 /*Models  NO FE Non Log transformed */
 reg pat_spend ib1.spend_quintiles
