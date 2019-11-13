@@ -3,51 +3,51 @@ use cost_variation, clear
 
 /*Models  NO FE Non Log transformed */
 reg pat_spend ib1.spend_quintiles
-outreg2 using models.doc, replace
+outreg2 using models.doc, replace alpha(0.001, 0.01, 0.05) dec(2)
 reg pat_spend ib1.spend_quintiles  weightedage percent_dual percent_non_white percent_female weightedhcc  
-outreg2 using models.doc, append
+outreg2 using models.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 reg pat_spend ib1.spend_quintiles weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure  
-outreg2 using models.doc, append
+outreg2 using models.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 reg pat_spend ib1.spend_quintiles weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure per_cap_hosp percap_pcp per_cap_nursin median2 ib4.hhi_quartiles  
-outreg2 using models.doc, append
+outreg2 using models.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 /*Models  FE Non Log transformed */
 reg pat_spend ib1.spend_quintiles i.state_code
-outreg2 using femodels.doc, replace
+outreg2 using femodels.doc, replace alpha(0.001, 0.01, 0.05) dec(2)
 
 reg pat_spend ib1.spend_quintiles  weightedage percent_dual percent_non_white percent_female weightedhcc  i.state_code
-outreg2 using femodels.doc, append
+outreg2 using femodels.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 reg pat_spend ib1.spend_quintiles weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure  i.state_code
-outreg2 using femodels.doc, append
+outreg2 using femodels.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 reg pat_spend ib1.spend_quintiles weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure per_cap_hosp percap_pcp per_cap_nursin median2 ib4.hhi_quartiles  i.state_code
-outreg2 using femodels.doc, append
-
+outreg2 using femodels.doc, append alpha(0.001, 0.01, 0.05) dec(2)
+ 
 /*Models  NO FE Non Log transformed   NO QUINTILES*/
 
 
 reg pat_spend   weightedage percent_dual percent_non_white percent_female weightedhcc  
-outreg2 using nqmodels.doc, replace
-
+outreg2 using nqmodels.doc, replace alpha(0.001, 0.01, 0.05) dec(2)
+ 
 reg pat_spend  weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure  
-outreg2 using nqmodels.doc, append
+outreg2 using nqmodels.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 reg pat_spend  weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure per_cap_hosp percap_pcp per_cap_nursin median2 ib4.hhi_quartiles  
-outreg2 using nqmodels.doc, append
+outreg2 using nqmodels.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 /*Models  FE Non Log transformed NO QUINTILES*/
 
 
 reg pat_spend   weightedage percent_dual percent_non_white percent_female weightedhcc  i.state_code
-outreg2 using nqfemodels.doc, replace
+outreg2 using nqfemodels.doc, replace alpha(0.001, 0.01, 0.05) dec(2)
 reg pat_spend  weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure  i.state_code
-outreg2 using nqfemodels.doc, append
+outreg2 using nqfemodels.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 reg pat_spend  weightedage percent_dual percent_non_white percent_female weightedhcc percent_fp percent_go per_tenure per_cap_hosp percap_pcp per_cap_nursin median2 ib4.hhi_quartiles  i.state_code
-outreg2 using nqfemodels.doc, append
+outreg2 using nqfemodels.doc, append alpha(0.001, 0.01, 0.05) dec(2)
 
 
 

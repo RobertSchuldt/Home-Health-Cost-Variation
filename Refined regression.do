@@ -1,6 +1,6 @@
 
 set more off
-use "C:\Users\3043340\Box\Cost Variation Final\update urban.dta", clear
+use "C:\Users\3043340\Box\Cost Variation Final\Test 11-13-19\final.dta", clear
 drop if fips_state_cd =="72"
 rename Distinct_Beneficiaries__non_LUPA num_bene
 
