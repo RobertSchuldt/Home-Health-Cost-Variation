@@ -97,7 +97,7 @@ data cost_analysis;
 	length fips $ 7;
 	fips = catt(FIPS_STATE_CD,FIPS_CNTY_CD);
 	if fips = '12025' then fips = '12086';
-
+	include = 1;
 
 	/*creating our other variables of interset within the puf*/
 		percent_female = ((Distinct_Beneficiaries__non_LUPA - Male_Beneficiaries)/Distinct_Beneficiaries__non_LUPA)*100;
@@ -137,7 +137,13 @@ urban2 = 0;
 data ahrf_puf;
 	merge cost_analysis (in = a) ahrf (in = b);
 	by fips;
-	if a;
-	if b;
 	run;
 
+proc freq;
+table include;
+run;
+
+data ahrf_puf2;
+	set ahrf_puf;
+	if include = . then include = 0;
+	run;
